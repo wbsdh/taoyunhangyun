@@ -60,4 +60,13 @@ class HmDianPingApplicationTests {
             stringRedisTemplate.opsForGeo().add(key,locations);
         }
     }
+
+    @Test
+    public void testUV(){
+
+        Long size = stringRedisTemplate.opsForHyperLogLog().size("hl2");
+        System.out.println(size);
+
+    }
+
 }
