@@ -5,11 +5,14 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import com.hmdp.entity.Shop;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -20,6 +23,7 @@ import static com.hmdp.utils.RedisConstants.*;
 @Slf4j
 @Component
 public class CacheClient {
+
     private final StringRedisTemplate stringRedisTemplate;
 
     public CacheClient(StringRedisTemplate stringRedisTemplate){
@@ -40,7 +44,11 @@ public class CacheClient {
     public <R,ID> R queryWithPassThrough(String keyPrefix, ID id, Class<R> type, Function<ID,R> dbFallback,Long time, TimeUnit unit) throws InterruptedException {
 
         String key = keyPrefix + id;
-
+        //使用布隆过滤器先筛出不存在的数据
+        Boolean aBoolean = BloomFilterUtils.get(key);
+        if (BooleanUtil.isFalse(aBoolean)){
+            return null;
+        }
         //1.查询redis中是否有数据
         String json = stringRedisTemplate.opsForValue().get(key);
         //2.判断是否存在

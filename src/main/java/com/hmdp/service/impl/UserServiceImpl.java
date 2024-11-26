@@ -11,6 +11,7 @@ import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.User;
 import com.hmdp.mapper.UserMapper;
 import com.hmdp.service.IUserService;
+import com.hmdp.utils.JwtUtil;
 import com.hmdp.utils.RedisConstants;
 import com.hmdp.utils.RegexUtils;
 import com.hmdp.utils.UserHolder;
@@ -81,15 +82,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             //用户不存在，创建用户，并保存到数据库
             user = createUserWithPhone(loginForm.getPhone());
         }
-        String token = UUID.randomUUID().toString(true);
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
         Map<String, Object> userMap = BeanUtil.beanToMap(userDTO,new HashMap<>(),
                 CopyOptions.create()
                 .setFieldValueEditor((fieldName,fieldValue) -> fieldValue.toString()));
-        //保存到redis
-        stringRedisTemplate.opsForHash().putAll(LOGIN_USER_KEY + token, userMap);
-        stringRedisTemplate.expire(LOGIN_USER_KEY + token,LOGIN_USER_TTL,TimeUnit.MINUTES);
-
+        String token = JwtUtil.createJWT(JwtUtil.SECRETKEY, 100000L, userMap);
         return Result.ok(token);
     }
 

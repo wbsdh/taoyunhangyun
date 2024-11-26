@@ -4,6 +4,7 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hmdp.dto.Result;
@@ -11,10 +12,7 @@ import com.hmdp.entity.Shop;
 import com.hmdp.mapper.ShopMapper;
 import com.hmdp.service.IShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hmdp.utils.CacheClient;
-import com.hmdp.utils.RedisConstants;
-import com.hmdp.utils.RedisData;
-import com.hmdp.utils.SystemConstants;
+import com.hmdp.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResult;
@@ -26,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -51,7 +50,17 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private CacheClient cacheClient;
-
+    @Resource
+    private ShopMapper shopMapper;
+    //将数据自动导入布隆过滤器
+    @PostConstruct
+    public void init(){
+        List<Shop> shopList = shopMapper.selectList(new LambdaQueryWrapper<>());
+        for (Shop shop : shopList) {
+            String key = CACHE_SHOP_KEY + shop.getId();
+            BloomFilterUtils.put(key);
+        }
+    }
     @Override
     public Result queryShopById(Long id) throws InterruptedException {
         //  缓存穿透
@@ -60,6 +69,8 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         //Shop shop = cacheClient.queryWithLogicalExpire(CACHE_SHOP_KEY,id,Shop.class,this::getById,CACHE_SHOP_TTL,TimeUnit.SECONDS);
         // 逻辑过期解决缓存击穿
         //Shop shop = queryWithLogicalExpire(id);
+        //布隆过滤器解决缓存击穿
+        //Shop shop = cacheClient.queryWithBloomFilter();
 
         return Result.ok(shop);
     }
@@ -101,7 +112,6 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         if (shop == null){
             //不存在，返回错误,将空值写入redis，解决缓存穿透
             stringRedisTemplate.opsForValue().set(CACHE_SHOP_KEY + id,"",CACHE_NULL_TTL, TimeUnit.MINUTES);
-
             return null;
         }
         //存在，将数据存入redis

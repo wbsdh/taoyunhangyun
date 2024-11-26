@@ -34,7 +34,6 @@ public class BlogController {
 
     @PostMapping
     public Result saveBlog(@RequestBody Blog blog) {
-
         return blogService.saveBlog(blog);
     }
 

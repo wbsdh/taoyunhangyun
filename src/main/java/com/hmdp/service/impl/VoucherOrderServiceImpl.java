@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.stream.*;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -234,12 +235,13 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
 
     }*/
     //代理对象
+    @Autowired
     private IVoucherOrderService proxy;
 
     @Transactional
     @Override
     public Result seckillVoucher(Long voucherId) throws InterruptedException {
-        long orderId = redisIdWorker.nextId("order");
+        long orderId = redisIdWorker.nextId();
         Long userId = UserHolder.getUser().getId();
         //执行lua脚本
         Long result = stringRedisTemplate.execute(
@@ -301,6 +303,5 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     @Transactional
     public void getResult(VoucherOrder voucherOrder) {
         save(voucherOrder);
-
     }
 }

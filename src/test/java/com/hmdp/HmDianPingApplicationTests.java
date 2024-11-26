@@ -36,7 +36,7 @@ class HmDianPingApplicationTests {
 
     @Test
     void test(){
-        long l = redisIdWorker.nextId("wcnm");
+        long l = redisIdWorker.nextId();
         System.out.println(l);
     }
 
@@ -67,6 +67,11 @@ class HmDianPingApplicationTests {
         Long size = stringRedisTemplate.opsForHyperLogLog().size("hl2");
         System.out.println(size);
 
+    }
+
+    @Test
+    public void testbl(){
+       // Boolean
     }
 
 }
