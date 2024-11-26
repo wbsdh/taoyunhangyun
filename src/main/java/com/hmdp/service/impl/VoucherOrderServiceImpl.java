@@ -187,7 +187,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
 /*        @Transactional
     @Override
     public Result seckillVoucher(Long voucherId) throws InterruptedException {
-        //1.查询优惠券
+        //1.查询门票
         SeckillVoucher seckillVoucher = seckillVoucherService.getById(voucherId);
         //2.判断是否开放秒杀
         LocalDateTime beginTime = seckillVoucher.getBeginTime();

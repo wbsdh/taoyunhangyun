@@ -1,5 +1,5 @@
 --参数列表
---KEYS[1] 优惠券id
+--KEYS[1] 门票id
 
 local voucherId = ARGV[1]
 --local voucherId = 13

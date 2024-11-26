@@ -34,7 +34,7 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
 
     @Override
     public Result queryVoucherOfShop(Long shopId) {
-        // 查询优惠券信息
+        // 查询门票信息
         List<Voucher> vouchers = getBaseMapper().queryVoucherOfShop(shopId);
         // 返回结果
         return Result.ok(vouchers);
@@ -43,7 +43,7 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
     @Override
     @Transactional
     public void addSeckillVoucher(Voucher voucher) {
-        // 保存优惠券
+        // 保存门票
         save(voucher);
         // 保存秒杀信息
         SeckillVoucher seckillVoucher = new SeckillVoucher();
@@ -52,7 +52,7 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
         seckillVoucher.setBeginTime(voucher.getBeginTime());
         seckillVoucher.setEndTime(voucher.getEndTime());
         seckillVoucherService.save(seckillVoucher);
-        //将优惠券存储到redis当中
+        //将门票存储到redis当中
         stringRedisTemplate.opsForValue().set(RedisConstants.SECKILL_STOCK_KEY + voucher.getId(),voucher.getStock().toString());
     }
 }

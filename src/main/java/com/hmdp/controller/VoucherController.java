@@ -25,8 +25,8 @@ public class VoucherController {
 
     /**
      * 新增普通券
-     * @param voucher 优惠券信息
-     * @return 优惠券id
+     * @param voucher 门票信息
+     * @return 门票id
      */
     @PostMapping
     public Result addVoucher(@RequestBody Voucher voucher) {
@@ -35,8 +35,8 @@ public class VoucherController {
     }
     /**
      * 新增秒杀券
-     * @param voucher 优惠券信息，包含秒杀信息
-     * @return 优惠券id
+     * @param voucher 门票信息，包含秒杀信息
+     * @return 门票id
      */
     @PostMapping("seckill")
     public Result addSeckillVoucher(@RequestBody Voucher voucher) {
@@ -45,9 +45,9 @@ public class VoucherController {
     }
 
     /**
-     * 查询店铺的优惠券列表
-     * @param shopId 店铺id
-     * @return 优惠券列表
+     * 查询景区的门票列表
+     * @param shopId 景区id
+     * @return 门票列表
      */
     @GetMapping("/list/{shopId}")
     public Result queryVoucherOfShop(@PathVariable("shopId") Long shopId) {

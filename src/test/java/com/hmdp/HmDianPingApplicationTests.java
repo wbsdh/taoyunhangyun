@@ -42,9 +42,9 @@ class HmDianPingApplicationTests {
 
     @Test
     void loadShopData(){
-        //查询店铺数据
+        //查询景区数据
         List<Shop> list = shopService.list();
-        //店铺分组 按照typeId
+        //景区分组 按照typeId
         Map<Long,List<Shop>> map = list.stream().collect(Collectors.groupingBy(Shop::getTypeId));
         //存入redis
         for (Map.Entry<Long, List<Shop>> longListEntry : map.entrySet()) {

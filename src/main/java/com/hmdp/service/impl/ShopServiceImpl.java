@@ -135,7 +135,7 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     }
 
     public void saveShop2Redis(Long id,Long expireSeconds){
-        // 1.查询店铺
+        // 1.查询景区
 
         Shop shop = getById(id);
 
@@ -152,10 +152,10 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     @Override
     @Transactional
     public Result update(Shop shop) {
-        //判断店铺id是否存在
+        //判断景区id是否存在
         Long id = shop.getId();
         if (id == null){
-            return Result.fail("店铺id不能为空");
+            return Result.fail("景区id不能为空");
         }
         //往数据库写入数据
         save(shop);
@@ -193,7 +193,7 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
             Distance distance = result.getDistance();
             distanceMap.put(shopIdStr,distance);
         });
-        //根据id查询店铺
+        //根据id查询景区
         List<Shop> shops = query().in("id", ids).last("ORDER BY FIELD(id," + StrUtil.join(",", ids) + ")").list();
         for (Shop shop : shops) {
             shop.setDistance(distanceMap.get(shop.getId().toString()).getValue());
